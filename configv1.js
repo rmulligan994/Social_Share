@@ -1,196 +1,207 @@
-<script>
-// Configuration object
-const config = {
-  // Company and branding
-  companyName: "Guillaume's Winery",
-  careersPageUrl: 'https://www.guillaumeswinery.com/careers',
-  
-  // Fonts and colors
-  fonts: {
-    main: 'Quicksand',
-    title: 'Corben'
-  },
-  colors: {
-    primary: '#BB86FC',
-    secondary: '#03DAC6',
-    background: '#121212',
-    text: '#FFFFFF',
-    subtext: '#B0B0B0',
-    border: '#333333',
-    buttonHover: '#3700B3'
-  },
-  
-  // Sharing options
-  shareHashtags: '#TraditionMeetsInnovation #JobAlert #Careers',
-  emailSubject: 'Exciting Job Opportunities at Guillaume\'s Winery',
-  
-  // Modal settings
-  modalWidth: '90%',
-  modalMaxWidth: '500px',
-  modalMaxHeight: '90vh',
-  
-  // Job listing selectors (customize these based on your HTML structure)
-  jobSelectors: {
-    container: '.job-result-row',
-    title: '.job-result-col1.title .h6-search',
-    reqId: '.job-result-col1.title .paragraph-sm-3',
-    location: '.job-result-col1.location .h6-search',
-    department: '.job-result-col1.dept .h6-search',
-    applyLink: 'a.btn.btn-three.w-inline-block'
-  },
-  
-  // Share button selector (customize this based on your HTML structure)
-  shareButtonSelector: '[class^="social_share-btn"]',
-  
-  // Customizable text
-  text: {
-    modalTitle: {
-      single: 'Select a Job to Share',
-      multiple: 'Select Jobs to Share'
+(function(window) {
+  const config = {
+    // Company and branding
+    companyName: "Guillaume's Winery",
+    careersPageUrl: 'https://www.guillaumeswinery.com/careers',
+    
+    // Fonts and colors
+    fonts: {
+      main: 'Quicksand',
+      title: 'Corben'
     },
-    modalSubtitle: {
-      twitter: 'Choose one job to share. Twitter has a character limit, so we\'ll create a tweet for the selected job.',
-      facebook: 'Choose one job to share. We\'ll share the direct link to the selected job posting.',
-      linkedin: 'You can select multiple jobs. We\'ll create a post featuring all selected jobs.',
-      email: 'You can select multiple jobs. We\'ll generate an email with details of all selected jobs.'
+    colors: {
+      primary: '#BB86FC',
+      secondary: '#03DAC6',
+      background: '#121212',
+      text: '#FFFFFF',
+      subtext: '#B0B0B0',
+      border: '#333333',
+      buttonHover: '#3700B3'
     },
-    shareButton: 'Share Selected Job(s)',
-    noJobSelectedAlert: 'Please select at least one job to share.',
-    emailInstructions: 'It seems your browser doesn\'t support automatic email composition. Please copy the content below and paste it into your email client:',
-    copyButtonText: 'Copy to Clipboard',
-    copiedText: 'Copied!'
+    
+    // Sharing options
+    shareHashtags: '#TraditionMeetsInnovation #JobAlert #Careers',
+    emailSubject: 'Exciting Job Opportunities at Guillaume\'s Winery',
+    
+    // Modal settings
+    modalWidth: '90%',
+    modalMaxWidth: '500px',
+    modalMaxHeight: '90vh',
+    
+    // Job listing selectors (customize these based on your HTML structure)
+    jobSelectors: {
+      container: '.job-result-row',
+      title: '.job-result-col1.title .h6-search',
+      reqId: '.job-result-col1.title .paragraph-sm-3',
+      location: '.job-result-col1.location .h6-search',
+      department: '.job-result-col1.dept .h6-search',
+      applyLink: 'a.btn.btn-three.w-inline-block'
+    },
+    
+    // Share button selector (customize this based on your HTML structure)
+    shareButtonSelector: '[class^="social_share-btn"]',
+    
+    // Customizable text
+    text: {
+      modalTitle: {
+        single: 'Select a Job to Share',
+        multiple: 'Select Jobs to Share'
+      },
+      modalSubtitle: {
+        twitter: 'Choose one job to share. Twitter has a character limit, so we\'ll create a tweet for the selected job.',
+        facebook: 'Choose one job to share. We\'ll share the direct link to the selected job posting.',
+        linkedin: 'You can select multiple jobs. We\'ll create a post featuring all selected jobs.',
+        email: 'You can select multiple jobs. We\'ll generate an email with details of all selected jobs.'
+      },
+      shareButton: 'Share Selected Job(s)',
+      noJobSelectedAlert: 'Please select at least one job to share.',
+      emailInstructions: 'It seems your browser doesn\'t support automatic email composition. Please copy the content below and paste it into your email client:',
+      copyButtonText: 'Copy to Clipboard',
+      copiedText: 'Copied!'
+    }
+  };
+
+  function initSocialShare() {
+    console.log('Social Share ready to go :)');
+    // Load fonts
+    const fontLink = document.createElement('link');
+    fontLink.href = `https://fonts.googleapis.com/css2?family=${config.fonts.title}:wght@400;700&family=${config.fonts.main}:wght@300;400;500;600;700&display=swap`;
+    fontLink.rel = 'stylesheet';
+    document.head.appendChild(fontLink);
+
+    // Add global styles
+    const globalStyles = document.createElement('style');
+    globalStyles.textContent = `
+      .gw-modal {
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: '${config.fonts.main}', sans-serif;
+      }
+      .gw-modal-content {
+        background-color: ${config.colors.background};
+        padding: 30px;
+        border-radius: 8px;
+        width: ${config.modalWidth};
+        max-width: ${config.modalMaxWidth};
+        max-height: ${config.modalMaxHeight};
+        color: ${config.colors.text};
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+      .gw-title {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-family: '${config.fonts.title}', cursive;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+        color: ${config.colors.primary};
+      }
+      .gw-subtitle {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        text-align: center;
+        color: ${config.colors.subtext};
+      }
+      .gw-job-list {
+        max-height: 50vh;
+        overflow-y: auto;
+        margin-bottom: 20px;
+        padding: 10px;
+      }
+      .gw-job-item {
+        margin-bottom: 10px;
+        border: 2px solid ${config.colors.border};
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+      .gw-job-item:hover {
+        border-color: ${config.colors.primary};
+        box-shadow: 0 2px 8px rgba(216, 108, 106, 0.15);
+      }
+      .gw-job-item label {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .gw-job-item label:hover {
+        background-color: #f5f5f5;
+      }
+      .gw-job-item input {
+        margin-right: 15px;
+      }
+      .gw-job-details {
+        flex-grow: 1;
+      }
+      .gw-job-title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 5px;
+        color: ${config.colors.secondary};
+      }
+      .gw-job-location {
+        font-size: 0.9rem;
+        color: ${config.colors.subtext};
+      }
+      .gw-button {
+        display: block;
+        width: calc(100% - 40px);
+        margin: 20px auto 0;
+        padding: 12px;
+        background-color: ${config.colors.primary};
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+      .gw-button:hover {
+        background-color: ${config.colors.buttonHover};
+      }
+      .gw-textarea {
+        width: 100%;
+        height: 150px;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid ${config.colors.border};
+        border-radius: 4px;
+        font-family: '${config.fonts.main}', sans-serif;
+        font-size: 0.9rem;
+        resize: vertical;
+      }
+    `;
+    document.head.appendChild(globalStyles);
+
+    // Set up event listeners
+    setupEventListeners();
+
+    // Set up MutationObserver to handle dynamically added buttons
+    const observer = new MutationObserver((mutations) => {
+      for (let mutation of mutations) {
+        if (mutation.type === 'childList') {
+          setupEventListeners();
+        }
+      }
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
   }
-};
 
-document.addEventListener('DOMContentLoaded', () => {
-  
-  console.log('Social Share ready to go :)');
-  // Load fonts
-  const fontLink = document.createElement('link');
-  fontLink.href = `https://fonts.googleapis.com/css2?family=${config.fonts.title}:wght@400;700&family=${config.fonts.main}:wght@300;400;500;600;700&display=swap`;
-  fontLink.rel = 'stylesheet';
-  document.head.appendChild(fontLink);
-
-  // Add global styles
-  const globalStyles = document.createElement('style');
-  globalStyles.textContent = `
-    .gw-modal {
-      position: fixed;
-      z-index: 1001;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: '${config.fonts.main}', sans-serif;
-    }
-    .gw-modal-content {
-      background-color: ${config.colors.background};
-      padding: 30px;
-      border-radius: 8px;
-      width: ${config.modalWidth};
-      max-width: ${config.modalMaxWidth};
-      max-height: ${config.modalMaxHeight};
-      color: ${config.colors.text};
-      overflow-y: auto;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .gw-title {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-family: '${config.fonts.title}', cursive;
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-align: center;
-      text-transform: uppercase;
-      color: ${config.colors.primary};
-    }
-    .gw-subtitle {
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      text-align: center;
-      color: ${config.colors.subtext};
-    }
-    .gw-job-list {
-      max-height: 50vh;
-      overflow-y: auto;
-      margin-bottom: 20px;
-      padding: 10px;
-    }
-    .gw-job-item {
-      margin-bottom: 10px;
-      border: 2px solid ${config.colors.border};
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      overflow: hidden;
-    }
-    .gw-job-item:hover {
-      border-color: ${config.colors.primary};
-      box-shadow: 0 2px 8px rgba(216, 108, 106, 0.15);
-    }
-    .gw-job-item label {
-      display: flex;
-      align-items: center;
-      padding: 15px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    .gw-job-item label:hover {
-      background-color: #f5f5f5;
-    }
-    .gw-job-item input {
-      margin-right: 15px;
-    }
-    .gw-job-details {
-      flex-grow: 1;
-    }
-    .gw-job-title {
-      font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 5px;
-      color: ${config.colors.secondary};
-    }
-    .gw-job-location {
-      font-size: 0.9rem;
-      color: ${config.colors.subtext};
-    }
-    .gw-button {
-      display: block;
-      width: calc(100% - 40px); /* Subtract left and right padding */
-      margin: 20px auto 0; /* Center the button and add top margin */
-      padding: 12px;
-      background-color: ${config.colors.primary};
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: background-color 0.3s ease;
-    }
-    .gw-button:hover {
-      background-color: ${config.colors.buttonHover};
-    }
-    .gw-textarea {
-      width: 100%;
-      height: 150px;
-      padding: 10px;
-      margin-bottom: 20px;
-      border: 1px solid ${config.colors.border};
-      border-radius: 4px;
-      font-family: '${config.fonts.main}', sans-serif;
-      font-size: 0.9rem;
-      resize: vertical;
-    }
-  `;
-  document.head.appendChild(globalStyles);
-
-  // Function to set up event listeners
   function setupEventListeners() {
     const shareButtons = document.querySelectorAll(config.shareButtonSelector);
     shareButtons.forEach(button => {
@@ -219,21 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Call the setup function
-  setupEventListeners();
-
-  // Set up MutationObserver to handle dynamically added buttons
-  const observer = new MutationObserver((mutations) => {
-    for (let mutation of mutations) {
-      if (mutation.type === 'childList') {
-        setupEventListeners();
-      }
-    }
-  });
-  
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  // Functions
   function getFavoriteJobs() {
     return Array.from(document.querySelectorAll(config.jobSelectors.container))
       .map(item => {
@@ -379,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
       jobLocation.className = 'gw-job-location';
       jobLocation.textContent = `${job.location} - ${job.department}`;
 
-      jobDetails.appendChild(jobTitle);
+     jobDetails.appendChild(jobTitle);
       jobDetails.appendChild(jobLocation);
 
       label.appendChild(input);
@@ -487,5 +483,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.body.appendChild(modal);
   }
-});
-</script>
+
+  // Expose the configuration and initialization function globally
+  window.SocialShare = {
+    config: config,
+    init: initSocialShare
+  };
+})(window);
