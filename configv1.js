@@ -351,6 +351,33 @@
     const jobList = document.createElement('div');
     jobList.className = 'gw-job-list';
 
+    // Add "Select All" button for email and LinkedIn
+    if (platform === 'linkedin' || platform === 'email') {
+      const selectAllContainer = document.createElement('div');
+      selectAllContainer.style.marginBottom = '10px';
+
+      const selectAllCheckbox = document.createElement('input');
+      selectAllCheckbox.type = 'checkbox';
+      selectAllCheckbox.id = 'select-all';
+
+      const selectAllLabel = document.createElement('label');
+      selectAllLabel.htmlFor = 'select-all';
+      selectAllLabel.textContent = 'Select All';
+      selectAllLabel.style.marginLeft = '5px';
+
+      selectAllContainer.appendChild(selectAllCheckbox);
+      selectAllContainer.appendChild(selectAllLabel);
+
+      selectAllCheckbox.addEventListener('change', (e) => {
+        const jobCheckboxes = jobList.querySelectorAll('input[type="checkbox"]');
+        jobCheckboxes.forEach(checkbox => {
+          checkbox.checked = e.target.checked;
+        });
+      });
+
+      jobList.appendChild(selectAllContainer);
+    }
+
     jobs.forEach((job, index) => {
       const jobItem = document.createElement('div');
       jobItem.className = 'gw-job-item';
@@ -360,6 +387,15 @@
       input.id = `job-${index}`;
       input.name = 'job-selection';
       input.value = index;
+
+      // Add change event listener for checkboxes
+      if (input.type === 'checkbox') {
+        input.addEventListener('change', () => {
+          const allChecked = Array.from(jobList.querySelectorAll('input[type="checkbox"]:not(#select-all)'))
+            .every(checkbox => checkbox.checked);
+          document.getElementById('select-all').checked = allChecked;
+        });
+      }
 
       const label = document.createElement('label');
       label.htmlFor = `job-${index}`;
@@ -375,7 +411,7 @@
       jobLocation.className = 'gw-job-location';
       jobLocation.textContent = `${job.location} - ${job.department}`;
 
-     jobDetails.appendChild(jobTitle);
+      jobDetails.appendChild(jobTitle);
       jobDetails.appendChild(jobLocation);
 
       label.appendChild(input);
@@ -389,7 +425,7 @@
     shareButton.textContent = config.text.shareButton;
 
     shareButton.addEventListener('click', () => {
-      const selectedJobs = Array.from(jobList.querySelectorAll('input:checked'))
+      const selectedJobs = Array.from(jobList.querySelectorAll('input:checked:not(#select-all)'))
         .map(input => jobs[parseInt(input.value)]);
 
       if (selectedJobs.length === 0) {
@@ -431,6 +467,7 @@
 
     document.body.appendChild(modal);
   }
+
 
   function handleShareButtonClick(platform) {
     showJobSelectionModal(platform);
