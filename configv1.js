@@ -63,6 +63,8 @@ const config = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  
+  console.log('Social Share ready to go :)');
   // Load fonts
   const fontLink = document.createElement('link');
   fontLink.href = `https://fonts.googleapis.com/css2?family=${config.fonts.title}:wght@400;700&family=${config.fonts.main}:wght@300;400;500;600;700&display=swap`;
